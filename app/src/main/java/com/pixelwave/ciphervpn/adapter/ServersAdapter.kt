@@ -1,26 +1,36 @@
-package com.example.ciphervpn.adapter
+package com.pixelwave.ciphervpn.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ciphervpn.R
-import com.example.ciphervpn.data.model.Server
+import com.pixelwave.ciphervpn.R
+import com.pixelwave.ciphervpn.model.Server
 
-class ServersAdapter(private val servers: List<Server>) :
+class ServersAdapter :
     RecyclerView.Adapter<ServersAdapter.ViewHolder>() {
 
     private var itemClickListener: ItemClickListener? = null
+    private var servers: MutableList<Server> = mutableListOf()
 
     interface ItemClickListener {
         fun onItemClick(view: View, position: Int)
     }
 
+    fun setOnItemClickListener(itemClickListener: ItemClickListener) {
+        this.itemClickListener = itemClickListener
+    }
+
+    fun setData(servers: MutableList<Server>) {
+        this.servers = servers
+        notifyDataSetChanged()
+    }
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val serverName: TextView = itemView.findViewById(R.id.server_name_tv)
-        val serverIp: TextView = itemView.findViewById(R.id.server_ip_tv)
+        private val serverName: TextView = itemView.findViewById(com.pixelwave.ciphervpn.R.id.server_name_tv)
+        private val serverIp: TextView = itemView.findViewById(R.id.server_ip_tv)
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {

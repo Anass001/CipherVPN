@@ -1,4 +1,4 @@
-package com.example.ciphervpn.viewmodel
+package com.pixelwave.ciphervpn.viewmodel
 
 import androidx.lifecycle.ViewModel
 

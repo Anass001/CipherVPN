@@ -1,4 +1,4 @@
-package com.example.ciphervpn
+package com.pixelwave.ciphervpn
 
 import org.junit.Test
 

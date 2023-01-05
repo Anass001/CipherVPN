@@ -8,11 +8,11 @@ apply {
 }
 
 android {
-    namespace 'com.example.ciphervpn'
+    namespace 'com.pixelwave.ciphervpn'
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.ciphervpn"
+        applicationId "com.pixelwave.ciphervpn"
         minSdk 21
         targetSdk 32
         versionCode 1
@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':vpnLib')
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'

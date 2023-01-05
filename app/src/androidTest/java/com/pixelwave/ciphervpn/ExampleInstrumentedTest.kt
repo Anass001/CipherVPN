@@ -1,4 +1,4 @@
-package com.example.ciphervpn
+package com.pixelwave.ciphervpn
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
