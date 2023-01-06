@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
@@ -54,11 +55,14 @@ class ServersFragment : Fragment() {
             ViewModelProvider(requireActivity())[ServerSharedViewModel::class.java]
         navController = NavHostFragment.findNavController(this)
 
+        binding.progressIndicator.setVisibilityAfterHide(GONE)
+
         serversRecyclerView.layoutManager = LinearLayoutManager(context)
         serversAdapter = ServersAdapter()
         serversRecyclerView.adapter = serversAdapter
 
         viewModel.getServers().observe(viewLifecycleOwner) {
+            binding.progressIndicator.hide()
             serversAdapter.setOnItemClickListener(object : ServersAdapter.ItemClickListener {
                 override fun onItemClick(view: View, position: Int) {
                     serverSharedViewModel.select(it[position])
@@ -66,6 +70,7 @@ class ServersFragment : Fragment() {
                 }
             })
             serversAdapter.setData(it as MutableList)
+            serversRecyclerView.scheduleLayoutAnimation()
         }
     }
 

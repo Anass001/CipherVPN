@@ -9,7 +9,7 @@
     <!-- OpenVPN colours #203155, #C66D0D -->
     <color name="primary">#3F51B5</color>      <!--500-->
     <color name="primary_dark">#303F9F</color> <!--700-->
-    <color name="accent">#FFA726</color>       <!-- Orange 400 -->
+    <color name="accent">#3bd580</color>       <!-- Orange 400 -->
     <color name="gelb">#ffff00</color>
     <color name="rot">#ff0000</color>
 
