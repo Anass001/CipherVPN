@@ -1,6 +1,6 @@
-package com.pixelwave.ciphervpn.network
+package com.pixelwave.ciphervpn.data.network
 
-import com.pixelwave.ciphervpn.model.Server
+import com.pixelwave.ciphervpn.data.model.Server
 import com.pixelwave.ciphervpn.util.CsvParser
 import okhttp3.ResponseBody
 import retrofit2.Converter

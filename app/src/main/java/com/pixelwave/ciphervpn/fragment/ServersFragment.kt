@@ -6,14 +6,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.pixelwave.ciphervpn.CipherApplication
 import com.pixelwave.ciphervpn.adapter.ServersAdapter
 import com.pixelwave.ciphervpn.databinding.FragmentServersBinding
 import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
 import com.pixelwave.ciphervpn.viewmodel.ServersViewModel
+import com.pixelwave.ciphervpn.viewmodel.ServersViewModelFactory
 
 class ServersFragment : Fragment() {
 
@@ -41,7 +44,12 @@ class ServersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[ServersViewModel::class.java]
+
+        viewModel = ViewModelProvider(
+            this,
+            (ServersViewModelFactory((requireActivity().application as CipherApplication).repository))
+        )[ServersViewModel::class.java]
+
         serverSharedViewModel =
             ViewModelProvider(requireActivity())[ServerSharedViewModel::class.java]
         navController = NavHostFragment.findNavController(this)

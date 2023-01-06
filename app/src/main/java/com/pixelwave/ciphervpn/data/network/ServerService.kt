@@ -1,6 +1,6 @@
-package com.pixelwave.ciphervpn.network
+package com.pixelwave.ciphervpn.data.network
 
-import com.pixelwave.ciphervpn.model.Server
+import com.pixelwave.ciphervpn.data.model.Server
 import retrofit2.Response
 import retrofit2.http.GET
 

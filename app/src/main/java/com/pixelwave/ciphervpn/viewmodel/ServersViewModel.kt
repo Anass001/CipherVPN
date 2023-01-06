@@ -4,27 +4,26 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pixelwave.ciphervpn.model.Server
-import com.pixelwave.ciphervpn.network.RetrofitClient
+import com.pixelwave.ciphervpn.data.Repository
+import com.pixelwave.ciphervpn.data.db.AppDatabase
+import com.pixelwave.ciphervpn.data.db.DatabaseBuilder
+import com.pixelwave.ciphervpn.data.model.Server
+import com.pixelwave.ciphervpn.data.network.RetrofitClient
+import com.pixelwave.ciphervpn.util.Constants
+import com.pixelwave.ciphervpn.util.CsvParser
 import kotlinx.coroutines.launch
+import okhttp3.MediaType
+import okhttp3.ResponseBody
 
-class ServersViewModel : ViewModel() {
+class ServersViewModel(private val repository: Repository) : ViewModel() {
 
-    private val retrofitClient = RetrofitClient()
-    private val serverService = retrofitClient.getServerService()
     private var servers: MutableLiveData<List<Server>> = MutableLiveData()
-    
+
     private fun loadServersList() {
         viewModelScope.launch {
-            try {
-                val response = serverService.getServers()
-                if (response.isSuccessful) {
-                    servers.value = response.body()
-                } else {
-                    println("Servers loading failed")
-                }
-            } catch (e: Exception) {
-                println("Servers loading failed with exception: ${e.message}")
+            val serversList = repository.servers()
+            serversList?.let {
+                servers.postValue(it)
             }
         }
     }

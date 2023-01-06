@@ -2,6 +2,10 @@
     <string name="app_name">CipherVPN</string>
     <string name="country_name">Country name</string>
     <string name="server_ip_address">Server IP address</string>
+
+    <string name="connect">Connect</string>
     <string name="connecting">Connecting…</string>
     <string name="connected">Connected</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="disconnecting">Disconnecting…</string>
 </resources>

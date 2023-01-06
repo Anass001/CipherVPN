@@ -2,6 +2,7 @@ package com.pixelwave.ciphervpn.fragment
 
 import android.app.Activity
 import android.content.Context
+import android.net.ConnectivityManager
 import android.net.VpnService
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -16,8 +17,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.pixelwave.ciphervpn.R
+import com.pixelwave.ciphervpn.data.model.ConnectionStatus
 import com.pixelwave.ciphervpn.databinding.FragmentHomeBinding
-import com.pixelwave.ciphervpn.model.Server
+import com.pixelwave.ciphervpn.data.model.Server
 import com.pixelwave.ciphervpn.viewmodel.HomeViewModel
 import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
 import de.blinkt.openvpn.OpenVpnApi.startVpn
@@ -27,16 +29,11 @@ import java.io.IOException
 
 class HomeFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = HomeFragment()
-    }
-
     private lateinit var viewModel: HomeViewModel
     private lateinit var serverSharedViewModel: ServerSharedViewModel
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var navController: NavController
-    private var isConnected: MutableLiveData<Boolean> = MutableLiveData()
 
     private lateinit var vpnThread: OpenVPNThread
     private lateinit var vpnService: OpenVPNService
@@ -51,7 +48,6 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        isConnected.value = false
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -68,19 +64,66 @@ class HomeFragment : Fragment() {
             navController.navigate(R.id.action_homeFragment_to_serversFragment)
         }
 
-        binding.connectBtn.setOnClickListener {
-            binding.connectBtn.text = getString(R.string.connecting)
-            val server = serverSharedViewModel.getSelected().value
-            prepareVpn(requireContext(), server!!)
-//            getServerResult.launch(
-//                Intent(context, ChangeServerActivity::class.java)
-//            )
+        serverSharedViewModel.getSelected().observe(viewLifecycleOwner) {
+            connect()
         }
 
-        isConnected.observe(viewLifecycleOwner) {
-            if (it) {
-                binding.connectBtn.text = getString(R.string.connected)
+        binding.connectBtn.setOnClickListener {
+            when (serverSharedViewModel.getConnectionStatus().value) {
+                ConnectionStatus.CONNECTED -> {
+                    disconnect()
+                }
+                ConnectionStatus.DISCONNECTED -> {
+                    connect()
+                }
+                else -> {}
             }
+        }
+
+        serverSharedViewModel.getConnectionStatus().observe(viewLifecycleOwner) {
+            when (it) {
+                ConnectionStatus.CONNECTED -> {
+                    binding.connectBtn.text = getString(R.string.disconnect)
+                }
+                ConnectionStatus.DISCONNECTED -> {
+                    binding.connectBtn.text = getString(R.string.connect)
+                }
+                ConnectionStatus.CONNECTING -> {
+                    binding.connectBtn.text = getString(R.string.connecting)
+                }
+                ConnectionStatus.DISCONNECTING -> {
+                    binding.connectBtn.text = getString(R.string.disconnecting)
+                }
+                else -> {
+                    binding.connectBtn.text = getString(R.string.connect)
+                }
+            }
+        }
+    }
+
+    private fun connect() {
+        if (!isNetworkAvailable(requireContext())) {
+            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
+        establishConnection()
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
+
+    private fun establishConnection() {
+        val server = serverSharedViewModel.getSelected().value
+        if (server != null) {
+            prepareConnection(requireContext(), server)
+        } else {
+            navController.navigate(R.id.action_homeFragment_to_serversFragment)
+            Toast.makeText(requireContext(), "Please select a server", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -88,15 +131,17 @@ class HomeFragment : Fragment() {
         try {
             val conf = server.openVpnConfigData
             startVpn(context, conf, server.countryShort, "vpn", "vpn")
-            isConnected.value = true
+            serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTED)
         } catch (exception: IOException) {
+            serverSharedViewModel.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
             exception.printStackTrace()
         } catch (exception: RemoteException) {
+            serverSharedViewModel.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
             exception.printStackTrace()
         }
     }
 
-    private val vpnResult =
+    private val vpnResult by lazy {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { vpnResult ->
             if (vpnResult.resultCode == Activity.RESULT_OK) {
                 //Permission granted, start the VPN
@@ -111,22 +156,19 @@ class HomeFragment : Fragment() {
                 ).show()
             }
         }
+    }
 
-    private fun prepareVpn(context: Context, server: Server) {
-//        if (!isConnected.value!!) {
-//            if (getInternetStatus()) {
+    private fun prepareConnection(context: Context, server: Server) {
         val intent = VpnService.prepare(context)
         if (intent != null) {
             vpnResult.launch(intent)
         } else {
             startVPN(context, server)
         }
-//                status("Connecting")
-//            } else {
-//                mContext.toast("No Internet Connection")
-//            }
-//        } else if (stopVpn()) {
-//            mContext.toast("Disconnect Successfully")
-//        }
+    }
+
+    private fun disconnect() {
+        OpenVPNThread.stop()
+        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
     }
 }

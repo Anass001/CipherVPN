@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.pixelwave.ciphervpn.R
-import com.pixelwave.ciphervpn.model.Server
+import com.pixelwave.ciphervpn.data.model.Server
 
 class ServersAdapter :
     RecyclerView.Adapter<ServersAdapter.ViewHolder>() {

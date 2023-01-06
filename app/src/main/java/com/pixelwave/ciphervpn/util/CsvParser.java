@@ -2,7 +2,7 @@ package com.pixelwave.ciphervpn.util;
 
 import android.util.Base64;
 
-import com.pixelwave.ciphervpn.model.Server;
+import com.pixelwave.ciphervpn.data.model.Server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,6 +35,7 @@ public class CsvParser {
 
     public static Server stringToServer(String line) {
         String[] vpn = line.split(",");
+
         return new Server(vpn[HOST_NAME],
                 vpn[IP_ADDRESS],
                 Integer.parseInt(vpn[SCORE]),
