@@ -8,9 +8,9 @@
 
     <Button
         android:id="@+id/connect_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Connect"
+        android:layout_width="150dp"
+        android:layout_height="160dp"
+        android:text="@string/connect"
         app:layout_constraintBottom_toTopOf="@id/servers_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
