@@ -1,22 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="16dp">
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/server_image"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/server_name_tv"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/country_name"
-        android:textColor="@color/black" />
+        android:layout_marginStart="15dp"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/server_image"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/server_status"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:src="@color/primary"
+        app:layout_constraintBottom_toBottomOf="@id/server_ping_tv"
+        app:layout_constraintStart_toStartOf="@id/server_name_tv"
+        app:layout_constraintTop_toTopOf="@id/server_ping_tv" />
 
     <TextView
-        android:id="@+id/server_ip_tv"
-        android:layout_width="match_parent"
+        android:id="@+id/server_ping_tv"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/server_ip_address" />
+        android:layout_marginStart="6dp"
+        android:text=""
+        android:textColor="@color/textColorSecondary"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/server_status"
+        app:layout_constraintTop_toBottomOf="@id/server_name_tv" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/connection_status_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:text="@string/connected"
+        android:textColor="@color/green_400"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

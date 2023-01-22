@@ -5,15 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pixelwave.ciphervpn.data.Repository
-import com.pixelwave.ciphervpn.data.db.AppDatabase
-import com.pixelwave.ciphervpn.data.db.DatabaseBuilder
 import com.pixelwave.ciphervpn.data.model.Server
-import com.pixelwave.ciphervpn.data.network.RetrofitClient
-import com.pixelwave.ciphervpn.util.Constants
-import com.pixelwave.ciphervpn.util.CsvParser
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 
 class ServersViewModel(private val repository: Repository) : ViewModel() {
 
@@ -21,7 +14,7 @@ class ServersViewModel(private val repository: Repository) : ViewModel() {
 
     private fun loadServersList() {
         viewModelScope.launch {
-            val serversList = repository.servers()
+            val serversList = repository.getServers()
             serversList?.let {
                 servers.postValue(it)
             }

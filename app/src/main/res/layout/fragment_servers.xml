@@ -21,6 +21,6 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         app:hideAnimationBehavior="outward"
-        app:indicatorColor="@color/accent"
+        app:indicatorColor="@color/colorAccent"
         app:layout_constraintTop_toTopOf="parent" />
 </FrameLayout>

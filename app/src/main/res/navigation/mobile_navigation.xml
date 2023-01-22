@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.pixelwave.ciphervpn.fragment.HomeFragment"
-        android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_serversFragment"
             app:destination="@id/navigation_servers" />
@@ -17,6 +17,6 @@
     <fragment
         android:id="@+id/navigation_servers"
         android:name="com.pixelwave.ciphervpn.fragment.ServersFragment"
-        android:label="fragment_servers"
+        android:label="Servers"
         tools:layout="@layout/fragment_servers" />
 </navigation>

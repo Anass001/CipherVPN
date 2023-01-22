@@ -6,24 +6,246 @@
     android:layout_height="match_parent"
     tools:context="com.pixelwave.ciphervpn.fragment.HomeFragment">
 
-    <Button
-        android:id="@+id/connect_btn"
-        android:layout_width="150dp"
-        android:layout_height="160dp"
-        android:text="@string/connect"
-        app:layout_constraintBottom_toTopOf="@id/servers_btn"
+    <com.pixelwave.ciphervpn.util.RippleBackground
+        android:id="@+id/ripple"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/servers_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:rb_color="@color/colorAccent"
+        app:rb_duration="6000"
+        app:rb_radius="28dp"
+        app:rb_rippleAmount="3"
+        app:rb_scale="6">
 
-    <Button
-        android:id="@+id/servers_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Servers"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                app:indicatorColor="@color/colorAccent"
+                app:indicatorSize="150dp"
+                app:trackThickness="2dp" />
+
+            <Button
+                android:id="@+id/connect_btn"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="150dp"
+                android:layout_height="159dp"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="18sp"
+                android:visibility="invisible"
+                app:strokeColor="@color/colorAccent"
+                app:strokeWidth="2dp" />
+        </FrameLayout>
+    </com.pixelwave.ciphervpn.util.RippleBackground>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/servers_card"
+        style="@style/Widget.Material3.CardView.Filled"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/connect_btn" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.6">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/server_image"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="22dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/server_image"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/server_name_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_server"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toEndOf="@id/server_image"
+                    app:layout_constraintTop_toTopOf="@id/server_image" />
+
+                <TextView
+                    android:id="@+id/server_ip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="–"
+                    android:textColor="@color/textColorSecondary"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toEndOf="@id/server_image"
+                    app:layout_constraintTop_toBottomOf="@id/server_name_tv" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="22dp"
+                android:src="@drawable/round_arrow_forward_ios_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/textColorSecondary" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/server_down"
+        style="@style/Widget.Material3.CardView.Filled"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@id/server_up"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/servers_card">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/download_ic"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="12dp"
+                android:rotation="180"
+                android:src="@drawable/ic_upload"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/download_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Download"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/download_ic"
+                app:layout_constraintStart_toEndOf="@id/download_ic"
+                app:layout_constraintTop_toTopOf="@id/download_ic" />
+
+            <TextView
+                android:id="@+id/download_speed_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="–"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="28sp"
+                app:layout_constraintStart_toStartOf="@id/download_text"
+                app:layout_constraintTop_toBottomOf="@id/download_ic" />
+
+            <TextView
+                android:id="@+id/meas_d_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:text="Mbps"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@id/download_speed_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/download_speed_text"
+                app:layout_constraintVertical_bias="0.8" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/server_up"
+        style="@style/Widget.Material3.CardView.Filled"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/server_down"
+        app:layout_constraintTop_toBottomOf="@id/servers_card">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/upload_ic"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="12dp"
+                android:src="@drawable/ic_upload"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/colorAccentSecondary" />
+
+            <TextView
+                android:id="@+id/upload_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Upload"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/upload_ic"
+                app:layout_constraintStart_toEndOf="@id/upload_ic"
+                app:layout_constraintTop_toTopOf="@id/upload_ic" />
+
+            <TextView
+                android:id="@+id/upload_speed_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="–"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="28sp"
+                app:layout_constraintStart_toStartOf="@id/upload_text"
+                app:layout_constraintTop_toBottomOf="@id/upload_ic" />
+
+            <TextView
+                android:id="@+id/meas_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:text="Mbps"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@id/upload_speed_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/upload_speed_text"
+                app:layout_constraintVertical_bias="0.8" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

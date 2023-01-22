@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixelwave.ciphervpn.CipherApplication
@@ -58,7 +59,13 @@ class ServersFragment : Fragment() {
         binding.progressIndicator.setVisibilityAfterHide(GONE)
 
         serversRecyclerView.layoutManager = LinearLayoutManager(context)
-        serversAdapter = ServersAdapter()
+        serversAdapter = ServersAdapter(serverSharedViewModel)
+        serversRecyclerView.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
         serversRecyclerView.adapter = serversAdapter
 
         viewModel.getServers().observe(viewLifecycleOwner) {
