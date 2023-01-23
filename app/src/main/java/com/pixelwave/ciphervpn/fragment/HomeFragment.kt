@@ -32,7 +32,10 @@ import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
 import de.blinkt.openvpn.OpenVpnApi.startVpn
 import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.OpenVPNThread
+import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope.coroutineContext
 import java.io.IOException
+import kotlin.coroutines.coroutineContext
 
 class HomeFragment : Fragment() {
 
@@ -93,12 +96,20 @@ class HomeFragment : Fragment() {
             when (it) {
                 ConnectionStatus.CONNECTED -> {
                     binding.connectBtn.text = getString(R.string.disconnect)
+                    binding.cpIndicator.visibility = View.VISIBLE
+                    binding.cpIndicator.progress = 100
+                    binding.ripple.startRippleAnimation()
                 }
                 ConnectionStatus.DISCONNECTED -> {
                     binding.connectBtn.text = getString(R.string.connect)
+                    binding.cpIndicator.visibility = View.INVISIBLE
+                    binding.ripple.stopRippleAnimation()
+
                 }
                 ConnectionStatus.CONNECTING -> {
                     binding.connectBtn.text = getString(R.string.connecting)
+                    binding.cpIndicator.visibility = View.VISIBLE
+                    binding.cpIndicator.isIndeterminate = true
                 }
                 ConnectionStatus.DISCONNECTING -> {
                     binding.connectBtn.text = getString(R.string.disconnecting)
@@ -145,7 +156,6 @@ class HomeFragment : Fragment() {
                 OpenVPNService.setDefaultStatus()
             }
             "CONNECTED" -> {
-                binding.ripple.startRippleAnimation()
                 serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTED)
             }
             "WAIT", "AUTH", "RECONNECTING", "TCP_CONNECT" -> {

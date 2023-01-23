@@ -26,25 +26,36 @@
             android:layout_height="match_parent"
             android:gravity="center">
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminate="true"
-                app:indicatorColor="@color/colorAccent"
-                app:indicatorSize="150dp"
-                app:trackThickness="2dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
 
-            <Button
-                android:id="@+id/connect_btn"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="150dp"
-                android:layout_height="159dp"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="18sp"
-                android:visibility="invisible"
-                app:strokeColor="@color/colorAccent"
-                app:strokeWidth="2dp" />
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/cp_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    app:indicatorColor="@color/colorAccent"
+                    app:indicatorSize="150dp"
+                    android:visibility="invisible"
+                    app:trackThickness="2dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/connect_btn"
+                    style="?attr/materialIconButtonFilledStyle"
+                    android:layout_width="153dp"
+                    android:layout_height="153dp"
+                    android:backgroundTint="#1B1C2D"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="18sp" />
+            </LinearLayout>
         </FrameLayout>
     </com.pixelwave.ciphervpn.util.RippleBackground>
 
