@@ -82,7 +82,6 @@ public class CsvParser {
             } catch (IOException ignored) {
             }
         }
-
         return servers;
     }
 

@@ -1,5 +1,7 @@
 package com.pixelwave.ciphervpn.fragment
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixelwave.ciphervpn.CipherApplication
+import com.pixelwave.ciphervpn.R
 import com.pixelwave.ciphervpn.adapter.ServersAdapter
 import com.pixelwave.ciphervpn.databinding.FragmentServersBinding
 import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
@@ -35,6 +38,8 @@ class ServersFragment : Fragment() {
     private lateinit var serversRecyclerView: RecyclerView
     private lateinit var serversAdapter: ServersAdapter
 
+    private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,6 +51,9 @@ class ServersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sharedPreferences =
+            activity?.getSharedPreferences("timestamps", Context.MODE_PRIVATE) ?: return
 
         viewModel = ViewModelProvider(
             this,
@@ -70,14 +78,24 @@ class ServersFragment : Fragment() {
 
         viewModel.getServers().observe(viewLifecycleOwner) {
             binding.progressIndicator.hide()
-            serversAdapter.setOnItemClickListener(object : ServersAdapter.ItemClickListener {
-                override fun onItemClick(view: View, position: Int) {
-                    serverSharedViewModel.select(it[position])
-                    navController.navigateUp()
-                }
-            })
-            serversAdapter.setData(it as MutableList)
-            serversRecyclerView.scheduleLayoutAnimation()
+            if (!it.isNullOrEmpty()) {
+                serversAdapter.setOnItemClickListener(object : ServersAdapter.ItemClickListener {
+                    override fun onItemClick(view: View, position: Int) {
+                        serverSharedViewModel.select(it[position])
+                        navController.navigateUp()
+                    }
+                })
+                serversAdapter.setData(it as MutableList)
+                serversRecyclerView.scheduleLayoutAnimation()
+            } else{
+                binding.noServersFoundLl.visibility = View.VISIBLE
+            }
+        }
+
+        binding.retryBtn.setOnClickListener {
+            binding.progressIndicator.show()
+            binding.noServersFoundLl.visibility = View.GONE
+            viewModel.refreshServers()
         }
     }
 

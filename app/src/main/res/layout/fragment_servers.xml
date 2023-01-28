@@ -13,7 +13,6 @@
         android:layoutAnimation="@anim/layout_animation"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progress_indicator"
         style="@style/Widget.MaterialComponents.LinearProgressIndicator"
@@ -22,5 +21,45 @@
         android:indeterminate="true"
         app:hideAnimationBehavior="outward"
         app:indicatorColor="@color/colorAccent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackCornerRadius="3dp" />
+
+    <LinearLayout
+        android:id="@+id/no_servers_found_ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/round_portable_wifi_off_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/textColorSecondary" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No servers found"
+            android:textColor="@color/textColorSecondary"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@id/server_image"
+            app:layout_constraintTop_toBottomOf="@id/server_name_tv" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/retry_btn"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Retry"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            app:strokeColor="@color/colorAccent"
+            app:rippleColor="@color/colorPrimary"/>
+    </LinearLayout>
+
 </FrameLayout>

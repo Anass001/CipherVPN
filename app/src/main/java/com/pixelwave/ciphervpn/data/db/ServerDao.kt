@@ -8,7 +8,6 @@ import com.pixelwave.ciphervpn.data.model.Server
 
 @Dao
 interface ServerDao {
-
     @Query("SELECT * FROM server")
     suspend fun getAll(): List<Server>
 

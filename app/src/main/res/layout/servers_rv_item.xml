@@ -6,7 +6,6 @@
     android:background="?android:attr/selectableItemBackground"
     android:padding="16dp">
 
-
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/server_image"
         android:layout_width="28dp"

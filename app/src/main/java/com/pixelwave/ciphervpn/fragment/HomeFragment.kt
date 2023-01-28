@@ -75,7 +75,16 @@ class HomeFragment : Fragment() {
         }
 
         serverSharedViewModel.getSelected().observe(viewLifecycleOwner) {
-            connect()
+            if (serverSharedViewModel.getConnectionStatus().value != ConnectionStatus.CONNECTED)
+                connect()
+
+            if (it != null) {
+                binding.serverNameTv.text = it.countryLong
+                binding.serverIp.text = it.ipAddress
+                Glide.with(requireContext())
+                    .load(FlagKit.getDrawable(requireContext(), it.countryShort))
+                    .into(binding.serverImage)
+            }
         }
 
         binding.connectBtn.setOnClickListener {
@@ -97,6 +106,7 @@ class HomeFragment : Fragment() {
                 ConnectionStatus.CONNECTED -> {
                     binding.connectBtn.text = getString(R.string.disconnect)
                     binding.cpIndicator.visibility = View.VISIBLE
+                    binding.cpIndicator.isIndeterminate = false
                     binding.cpIndicator.progress = 100
                     binding.ripple.startRippleAnimation()
                 }
@@ -113,9 +123,12 @@ class HomeFragment : Fragment() {
                 }
                 ConnectionStatus.DISCONNECTING -> {
                     binding.connectBtn.text = getString(R.string.disconnecting)
+                    binding.cpIndicator.visibility = View.VISIBLE
+                    binding.cpIndicator.isIndeterminate = true
                 }
                 else -> {
                     binding.connectBtn.text = getString(R.string.connect)
+                    binding.cpIndicator.visibility = View.INVISIBLE
                 }
             }
         }
@@ -136,19 +149,15 @@ class HomeFragment : Fragment() {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
-
     private fun establishConnection() {
-        val server = serverSharedViewModel.getSelected().value
-        if (server != null) {
-            prepareConnection(requireContext(), server)
-            binding.serverNameTv.text = server.countryLong
-            binding.serverIp.text = server.ipAddress
-            Glide.with(requireContext())
-                .load(FlagKit.getDrawable(requireContext(), server.countryShort))
-                .into(binding.serverImage)
+        serverSharedViewModel.getSelected().value.let { server ->
+            if (server != null) {
+                prepareConnection(requireContext(), server)
+            }
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun setStatus(connectionState: String?) {
         if (connectionState != null) when (connectionState) {
             "DISCONNECTED" -> {
@@ -156,7 +165,13 @@ class HomeFragment : Fragment() {
                 OpenVPNService.setDefaultStatus()
             }
             "CONNECTED" -> {
-                serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTED)
+                binding.cpIndicator.setProgressCompat(100, true)
+                GlobalScope.launch {
+                    delay(1500)
+                    withContext(Dispatchers.Main) {
+                        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTED)
+                    }
+                }
             }
             "WAIT", "AUTH", "RECONNECTING", "TCP_CONNECT" -> {
                 serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTING)
@@ -218,8 +233,10 @@ class HomeFragment : Fragment() {
         byteIn: String,
         byteOut: String
     ) {
-        binding.downloadSpeedText.text = byteIn
-        binding.uploadSpeedText.text = byteOut
+        binding.downloadSpeedText.text = byteIn.substring(0, byteIn.indexOf(" "))
+        binding.uploadSpeedText.text = byteOut.substring(0, byteOut.indexOf(" "))
+        binding.measText.text = byteIn.substring(byteIn.indexOf(" ") + 1)
+        binding.measDText.text = byteOut.substring(byteOut.indexOf(" ") + 1)
     }
 
     private fun startVPN(context: Context, server: Server) {
@@ -235,7 +252,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private val vpnResult by lazy {
+    private val vpnResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { vpnResult ->
             if (vpnResult.resultCode == Activity.RESULT_OK) {
                 //Permission granted, start the VPN
@@ -250,7 +267,7 @@ class HomeFragment : Fragment() {
                 ).show()
             }
         }
-    }
+
 
     private fun prepareConnection(context: Context, server: Server) {
         val intent = VpnService.prepare(context)

@@ -27,4 +27,8 @@ class ServersViewModel(private val repository: Repository) : ViewModel() {
         }
         return servers
     }
+
+    fun refreshServers() {
+        loadServersList()
+    }
 }

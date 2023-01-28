@@ -41,7 +41,7 @@ class ServersAdapter(private val serverSharedViewModel: ServerSharedViewModel) :
         private val serverPing: TextView = itemView.findViewById(R.id.server_ping_tv)
         private val serverStatus: CircleImageView =
             itemView.findViewById(R.id.server_status)
-        val connectionStatus = itemView.findViewById<TextView>(R.id.connection_status_tv)
+        val connectionStatus: TextView = itemView.findViewById(R.id.connection_status_tv)
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
@@ -77,13 +77,13 @@ class ServersAdapter(private val serverSharedViewModel: ServerSharedViewModel) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val server = servers[position]
 
-        serverSharedViewModel.getSelected().observeForever {
-            if (it?.id == server.id) {
-                holder.connectionStatus.visibility = View.VISIBLE
-            } else {
-                holder.connectionStatus.visibility = View.GONE
-            }
+        val currServer = serverSharedViewModel.getSelected().value
+        if (currServer?.id == server.id) {
+            holder.connectionStatus.visibility = View.VISIBLE
+        } else {
+            holder.connectionStatus.visibility = View.GONE
         }
+
         holder.bind(server, itemClickListener)
     }
 

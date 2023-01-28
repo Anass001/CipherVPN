@@ -38,6 +38,7 @@
                     android:indeterminate="true"
                     app:indicatorColor="@color/colorAccent"
                     app:indicatorSize="150dp"
+                    app:trackCornerRadius="3dp"
                     android:visibility="invisible"
                     app:trackThickness="2dp" />
             </LinearLayout>
