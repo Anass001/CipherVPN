@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pixelwave.ciphervpn.CipherApplication
 import com.pixelwave.ciphervpn.R
 import com.pixelwave.ciphervpn.adapter.ServersAdapter
+import com.pixelwave.ciphervpn.data.model.ConnectionStatus
 import com.pixelwave.ciphervpn.databinding.FragmentServersBinding
 import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
 import com.pixelwave.ciphervpn.viewmodel.ServersViewModel
@@ -38,8 +39,6 @@ class ServersFragment : Fragment() {
     private lateinit var serversRecyclerView: RecyclerView
     private lateinit var serversAdapter: ServersAdapter
 
-    private lateinit var sharedPreferences: SharedPreferences
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,9 +50,6 @@ class ServersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        sharedPreferences =
-            activity?.getSharedPreferences("timestamps", Context.MODE_PRIVATE) ?: return
 
         viewModel = ViewModelProvider(
             this,
@@ -81,6 +77,7 @@ class ServersFragment : Fragment() {
             if (!it.isNullOrEmpty()) {
                 serversAdapter.setOnItemClickListener(object : ServersAdapter.ItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
+                        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTING)
                         serverSharedViewModel.select(it[position])
                         navController.navigateUp()
                     }

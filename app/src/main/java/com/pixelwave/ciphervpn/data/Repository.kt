@@ -12,31 +12,28 @@ class Repository(
     private val sharedPreferences: SharedPreferences
 ) {
     private fun shouldUpdate(): Boolean {
-        val lastUpdate = sharedPreferences.getInt("last_update", 0)
-        return System.currentTimeMillis() - lastUpdate > 900000
+        val lastUpdate = sharedPreferences.getLong("last_update_L", 0L)
+        return System.currentTimeMillis().minus(lastUpdate) > 900000L
     }
 
+    //TODO: simplify this function
     suspend fun getServers(): List<Server>? {
-        return try {
+        try {
             if (shouldUpdate()) {
                 val response = serverApi.getServers()
                 if (response.isSuccessful) {
                     with(sharedPreferences.edit()) {
-                        putInt("last_update", System.currentTimeMillis().toInt())
+                        putLong("last_update_L", System.currentTimeMillis())
                         apply()
                     }
-                    Log.i("Repository", sharedPreferences.getInt("last_update", 0).toString())
-                    response.body().also { serverDao.updateAll(response.body()!!) }
+                    return response.body().also { serverDao.updateAll(response.body()!!) }
                 } else {
                     println("Servers loading from network failed")
-                    serverDao.getAll()
                 }
-            } else {
-                serverDao.getAll()
             }
         } catch (e: Exception) {
             println("Servers loading from network failed with exception: ${e.message}")
-            serverDao.getAll()
         }
+        return serverDao.getAll()
     }
 }

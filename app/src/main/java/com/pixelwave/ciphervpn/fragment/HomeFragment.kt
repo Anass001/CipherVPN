@@ -9,6 +9,7 @@ import android.net.ConnectivityManager
 import android.net.VpnService
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.RemoteException
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -74,6 +75,22 @@ class HomeFragment : Fragment() {
             navController.navigate(R.id.action_homeFragment_to_serversFragment)
         }
 
+        val timer = object : CountDownTimer(900000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val minutes = (millisUntilFinished / 1000) / 60
+                val seconds = (millisUntilFinished / 1000) % 60
+
+                binding.connectBtn.text = String.format("%02d:%02d", minutes, seconds)
+
+                val progress = ((millisUntilFinished * 100) / 900000).toInt()
+                binding.cpIndicator.setProgressCompat(progress, true)
+            }
+
+            override fun onFinish() {
+                disconnect()
+            }
+        }
+
         serverSharedViewModel.getSelected().observe(viewLifecycleOwner) {
             if (serverSharedViewModel.getConnectionStatus().value != ConnectionStatus.CONNECTED)
                 connect()
@@ -104,27 +121,30 @@ class HomeFragment : Fragment() {
         serverSharedViewModel.getConnectionStatus().observe(viewLifecycleOwner) {
             when (it) {
                 ConnectionStatus.CONNECTED -> {
-                    binding.connectBtn.text = getString(R.string.disconnect)
+//                    binding.connectBtn.text = getString(R.string.disconnect)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = false
                     binding.cpIndicator.progress = 100
                     binding.ripple.startRippleAnimation()
+                    timer.start()
                 }
                 ConnectionStatus.DISCONNECTED -> {
                     binding.connectBtn.text = getString(R.string.connect)
                     binding.cpIndicator.visibility = View.INVISIBLE
                     binding.ripple.stopRippleAnimation()
-
+                    timer.cancel()
                 }
                 ConnectionStatus.CONNECTING -> {
                     binding.connectBtn.text = getString(R.string.connecting)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = true
+                    timer.cancel()
                 }
                 ConnectionStatus.DISCONNECTING -> {
                     binding.connectBtn.text = getString(R.string.disconnecting)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = true
+                    timer.cancel()
                 }
                 else -> {
                     binding.connectBtn.text = getString(R.string.connect)
@@ -255,7 +275,6 @@ class HomeFragment : Fragment() {
     private val vpnResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { vpnResult ->
             if (vpnResult.resultCode == Activity.RESULT_OK) {
-                //Permission granted, start the VPN
                 serverSharedViewModel.getSelected().value?.let { server ->
                     startVPN(requireContext(), server)
                 }
