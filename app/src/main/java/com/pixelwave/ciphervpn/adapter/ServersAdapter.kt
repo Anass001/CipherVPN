@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.murgupluoglu.flagkit.FlagKit
 import com.pixelwave.ciphervpn.R
+import com.pixelwave.ciphervpn.data.model.ConnectionStatus
 import com.pixelwave.ciphervpn.data.model.Server
 import com.pixelwave.ciphervpn.util.RippleBackground
 import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
@@ -42,6 +43,7 @@ class ServersAdapter(private val serverSharedViewModel: ServerSharedViewModel) :
         private val serverStatus: CircleImageView =
             itemView.findViewById(R.id.server_status)
         val connectionStatus: TextView = itemView.findViewById(R.id.connection_status_tv)
+
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
@@ -78,7 +80,9 @@ class ServersAdapter(private val serverSharedViewModel: ServerSharedViewModel) :
         val server = servers[position]
 
         val currServer = serverSharedViewModel.getSelected().value
-        if (currServer?.id == server.id) {
+        val isConnected =
+            serverSharedViewModel.getConnectionStatus().value == ConnectionStatus.CONNECTED
+        if (isConnected && currServer?.id == server.id) {
             holder.connectionStatus.visibility = View.VISIBLE
         } else {
             holder.connectionStatus.visibility = View.GONE

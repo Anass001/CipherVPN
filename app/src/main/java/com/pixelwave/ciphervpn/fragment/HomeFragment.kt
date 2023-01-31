@@ -75,14 +75,15 @@ class HomeFragment : Fragment() {
             navController.navigate(R.id.action_homeFragment_to_serversFragment)
         }
 
-        val timer = object : CountDownTimer(900000, 1000) {
+        val connDuration = 1
+        val timer = object : CountDownTimer((connDuration * 60 * 1000).toLong(), 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val minutes = (millisUntilFinished / 1000) / 60
                 val seconds = (millisUntilFinished / 1000) % 60
 
                 binding.connectBtn.text = String.format("%02d:%02d", minutes, seconds)
 
-                val progress = ((millisUntilFinished * 100) / 900000).toInt()
+                val progress = ((millisUntilFinished * 100) / (connDuration * 60 * 1000)).toInt()
                 binding.cpIndicator.setProgressCompat(progress, true)
             }
 
@@ -92,7 +93,7 @@ class HomeFragment : Fragment() {
         }
 
         serverSharedViewModel.getSelected().observe(viewLifecycleOwner) {
-            if (serverSharedViewModel.getConnectionStatus().value != ConnectionStatus.CONNECTED)
+            if (serverSharedViewModel.getConnectionStatus().value == ConnectionStatus.CONNECTING)
                 connect()
 
             if (it != null) {
@@ -121,7 +122,6 @@ class HomeFragment : Fragment() {
         serverSharedViewModel.getConnectionStatus().observe(viewLifecycleOwner) {
             when (it) {
                 ConnectionStatus.CONNECTED -> {
-//                    binding.connectBtn.text = getString(R.string.disconnect)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = false
                     binding.cpIndicator.progress = 100
@@ -132,19 +132,19 @@ class HomeFragment : Fragment() {
                     binding.connectBtn.text = getString(R.string.connect)
                     binding.cpIndicator.visibility = View.INVISIBLE
                     binding.ripple.stopRippleAnimation()
-                    timer.cancel()
+//                    timer.cancel()
                 }
                 ConnectionStatus.CONNECTING -> {
                     binding.connectBtn.text = getString(R.string.connecting)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = true
-                    timer.cancel()
+//                    timer.cancel()
                 }
                 ConnectionStatus.DISCONNECTING -> {
                     binding.connectBtn.text = getString(R.string.disconnecting)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = true
-                    timer.cancel()
+//                    timer.cancel()
                 }
                 else -> {
                     binding.connectBtn.text = getString(R.string.connect)
@@ -187,7 +187,7 @@ class HomeFragment : Fragment() {
             "CONNECTED" -> {
                 binding.cpIndicator.setProgressCompat(100, true)
                 GlobalScope.launch {
-                    delay(1500)
+                    delay(1000)
                     withContext(Dispatchers.Main) {
                         serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTED)
                     }
@@ -299,6 +299,6 @@ class HomeFragment : Fragment() {
 
     private fun disconnect() {
         OpenVPNThread.stop()
-        binding.ripple.stopRippleAnimation()
+        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
     }
 }
