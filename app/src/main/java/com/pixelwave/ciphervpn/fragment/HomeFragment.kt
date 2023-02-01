@@ -18,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
@@ -75,25 +76,8 @@ class HomeFragment : Fragment() {
             navController.navigate(R.id.action_homeFragment_to_serversFragment)
         }
 
-        val connDuration = 1
-        val timer = object : CountDownTimer((connDuration * 60 * 1000).toLong(), 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val minutes = (millisUntilFinished / 1000) / 60
-                val seconds = (millisUntilFinished / 1000) % 60
-
-                binding.connectBtn.text = String.format("%02d:%02d", minutes, seconds)
-
-                val progress = ((millisUntilFinished * 100) / (connDuration * 60 * 1000)).toInt()
-                binding.cpIndicator.setProgressCompat(progress, true)
-            }
-
-            override fun onFinish() {
-                disconnect()
-            }
-        }
-
         serverSharedViewModel.getSelected().observe(viewLifecycleOwner) {
-            if (serverSharedViewModel.getConnectionStatus().value == ConnectionStatus.CONNECTING)
+            if (serverSharedViewModel.getConnectionStatus().value == ConnectionStatus.CONNECTION_ATTEMPT)
                 connect()
 
             if (it != null) {
@@ -106,15 +90,16 @@ class HomeFragment : Fragment() {
         }
 
         binding.connectBtn.setOnClickListener {
-            if (serverSharedViewModel.getConnectionStatus().value == ConnectionStatus.CONNECTED) {
-                disconnect()
+            if (serverSharedViewModel.getSelected().value == null) {
+                Toast.makeText(requireContext(), "Please select a server", Toast.LENGTH_SHORT)
+                    .show()
+                navController.navigate(R.id.action_homeFragment_to_serversFragment)
             } else {
-                if (serverSharedViewModel.getSelected().value == null) {
-                    Toast.makeText(requireContext(), "Please select a server", Toast.LENGTH_SHORT)
-                        .show()
-                    navController.navigate(R.id.action_homeFragment_to_serversFragment)
-                } else {
-                    connect()
+                when (serverSharedViewModel.getConnectionStatus().value) {
+                    ConnectionStatus.CONNECTED -> disconnect()
+                    ConnectionStatus.DISCONNECTED -> connect()
+                    else -> {
+                    }
                 }
             }
         }
@@ -124,27 +109,30 @@ class HomeFragment : Fragment() {
                 ConnectionStatus.CONNECTED -> {
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = false
-                    binding.cpIndicator.progress = 100
                     binding.ripple.startRippleAnimation()
-                    timer.start()
+                }
+                ConnectionStatus.CONNECTING_SUCCESS -> {
+                    serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTED)
                 }
                 ConnectionStatus.DISCONNECTED -> {
                     binding.connectBtn.text = getString(R.string.connect)
                     binding.cpIndicator.visibility = View.INVISIBLE
                     binding.ripple.stopRippleAnimation()
-//                    timer.cancel()
                 }
                 ConnectionStatus.CONNECTING -> {
                     binding.connectBtn.text = getString(R.string.connecting)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = true
-//                    timer.cancel()
+                }
+                ConnectionStatus.CONNECTION_ATTEMPT -> {
+                    binding.connectBtn.text = getString(R.string.connecting)
+                    binding.cpIndicator.visibility = View.VISIBLE
+                    binding.cpIndicator.isIndeterminate = true
                 }
                 ConnectionStatus.DISCONNECTING -> {
                     binding.connectBtn.text = getString(R.string.disconnecting)
                     binding.cpIndicator.visibility = View.VISIBLE
                     binding.cpIndicator.isIndeterminate = true
-//                    timer.cancel()
                 }
                 else -> {
                     binding.connectBtn.text = getString(R.string.connect)
@@ -179,6 +167,7 @@ class HomeFragment : Fragment() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun setStatus(connectionState: String?) {
+        Log.i("_OpenVPN_", "Connection state: $connectionState")
         if (connectionState != null) when (connectionState) {
             "DISCONNECTED" -> {
                 serverSharedViewModel.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
@@ -189,7 +178,7 @@ class HomeFragment : Fragment() {
                 GlobalScope.launch {
                     delay(1000)
                     withContext(Dispatchers.Main) {
-                        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTED)
+                        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTING_SUCCESS)
                     }
                 }
             }
@@ -237,6 +226,8 @@ class HomeFragment : Fragment() {
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
             broadcastReceiver!!, IntentFilter("connectionState")
         )
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+            broadcastReceiver!!, IntentFilter("countdownTimer"))
         super.onResume()
     }
 
@@ -257,6 +248,22 @@ class HomeFragment : Fragment() {
         binding.uploadSpeedText.text = byteOut.substring(0, byteOut.indexOf(" "))
         binding.measText.text = byteIn.substring(byteIn.indexOf(" ") + 1)
         binding.measDText.text = byteOut.substring(byteOut.indexOf(" ") + 1)
+
+        val connDuration = 1
+        val time = duration.split(":")
+        val minutes = time[1].toInt()
+        val seconds = time[2].toInt()
+        val millis = (minutes * 60 + seconds) * 1000
+        val millisUntilFinished = (connDuration * 60 * 1000) - millis
+
+        binding.connectBtn.text = String.format("%02d:%02d", minutes, seconds)
+
+        val progress = ((millisUntilFinished * 100) / (connDuration * 60 * 1000))
+        binding.cpIndicator.setProgressCompat(progress, true)
+
+        if (progress == 0) {
+            disconnect()
+        }
     }
 
     private fun startVPN(context: Context, server: Server) {
@@ -299,6 +306,5 @@ class HomeFragment : Fragment() {
 
     private fun disconnect() {
         OpenVPNThread.stop()
-        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
     }
 }

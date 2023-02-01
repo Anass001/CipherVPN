@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -25,10 +26,6 @@ import com.pixelwave.ciphervpn.viewmodel.ServersViewModel
 import com.pixelwave.ciphervpn.viewmodel.ServersViewModelFactory
 
 class ServersFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = ServersFragment()
-    }
 
     private lateinit var viewModel: ServersViewModel
     private lateinit var serverSharedViewModel: ServerSharedViewModel
@@ -77,14 +74,19 @@ class ServersFragment : Fragment() {
             if (!it.isNullOrEmpty()) {
                 serversAdapter.setOnItemClickListener(object : ServersAdapter.ItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTING)
+                        if (serverSharedViewModel.getConnectionStatus().value == ConnectionStatus.CONNECTED) {
+                            Toast.makeText(context, "Please disconnect first", Toast.LENGTH_SHORT)
+                                .show()
+                            return
+                        }
+                        serverSharedViewModel.updateConnectionStatus(ConnectionStatus.CONNECTION_ATTEMPT)
                         serverSharedViewModel.select(it[position])
                         navController.navigateUp()
                     }
                 })
                 serversAdapter.setData(it as MutableList)
                 serversRecyclerView.scheduleLayoutAnimation()
-            } else{
+            } else {
                 binding.noServersFoundLl.visibility = View.VISIBLE
             }
         }
