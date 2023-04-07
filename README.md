@@ -3,6 +3,15 @@ CipherVPN is an Android VPN client based on the OpenVPN Android Client project, 
 
 <img src="https://github.com/Anass001/CipherVPN/blob/master/preview.jpg" align="center">
 
+## How It Works
+CypherVPN enables users to establish a secure VPN tunnel between their device and the server. This encrypted tunnel passes all data through a secure channel, providing protection against hackers, surveillance, and other online threats. CypherVPN also allows users to change their virtual location, masking their real IP address and providing access to geo-restricted content.
+<img src="https://github.com/Anass001/CipherVPN/blob/master/how-it-works.png" align="center">
+
+## Architechture
+The application is designed as a single-activity app and implements the MVVM architecture, following the guidelines provided [here](https://developer.android.com/jetpack/docs/guide).
+
+<img src="https://github.com/Anass001/CryptoTracker/blob/main/architecture.png" align="left" width="360">
+
 ## Used Libraries
 - [Material Components](https://github.com/material-components) (Design System)
 - [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) (Store and manage UI-related data)
@@ -15,27 +24,5 @@ CipherVPN is an Android VPN client based on the OpenVPN Android Client project, 
 - [Room](https://developer.android.com/topic/libraries/architecture/room) (Abstraction layer over SQLite)
 - [Retrofit](https://github.com/square/retrofit) (HTTP client)
 
-## Architechture
+## API
 
-The application is designed as a single-activity app and implements the MVVM architecture, following the guidelines provided [here](https://developer.android.com/jetpack/docs/guide).
-
-<img src="https://github.com/Anass001/CryptoTracker/blob/main/architecture.png" align="left" width="360">
-
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
