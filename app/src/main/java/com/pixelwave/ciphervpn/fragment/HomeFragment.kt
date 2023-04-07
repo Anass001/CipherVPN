@@ -9,7 +9,6 @@ import android.net.ConnectivityManager
 import android.net.VpnService
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.os.RemoteException
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -18,8 +17,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -29,19 +26,17 @@ import com.pixelwave.ciphervpn.R
 import com.pixelwave.ciphervpn.data.model.ConnectionStatus
 import com.pixelwave.ciphervpn.databinding.FragmentHomeBinding
 import com.pixelwave.ciphervpn.data.model.Server
-import com.pixelwave.ciphervpn.viewmodel.HomeViewModel
 import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import de.blinkt.openvpn.OpenVpnApi.startVpn
 import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.OpenVPNThread
 import kotlinx.coroutines.*
-import kotlinx.coroutines.GlobalScope.coroutineContext
 import java.io.IOException
-import kotlin.coroutines.coroutineContext
 
-class HomeFragment : Fragment() {
+@AndroidEntryPoint
+class HomeFragment: Fragment() {
 
-    private lateinit var viewModel: HomeViewModel
     private lateinit var serverSharedViewModel: ServerSharedViewModel
 
     private lateinit var binding: FragmentHomeBinding
@@ -67,7 +62,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         serverSharedViewModel =
             ViewModelProvider(requireActivity())[ServerSharedViewModel::class.java]
         navController = NavHostFragment.findNavController(this)
@@ -96,10 +90,8 @@ class HomeFragment : Fragment() {
                 navController.navigate(R.id.action_homeFragment_to_serversFragment)
             } else {
                 when (serverSharedViewModel.getConnectionStatus().value) {
-                    ConnectionStatus.CONNECTED -> disconnect()
                     ConnectionStatus.DISCONNECTED -> connect()
-                    else -> {
-                    }
+                    else -> disconnect()
                 }
             }
         }
@@ -118,6 +110,8 @@ class HomeFragment : Fragment() {
                     binding.connectBtn.text = getString(R.string.connect)
                     binding.cpIndicator.visibility = View.INVISIBLE
                     binding.ripple.stopRippleAnimation()
+                    binding.downloadSpeedText.text = "–"
+                    binding.uploadSpeedText.text = "–"
                 }
                 ConnectionStatus.CONNECTING -> {
                     binding.connectBtn.text = getString(R.string.connecting)
@@ -227,7 +221,8 @@ class HomeFragment : Fragment() {
             broadcastReceiver!!, IntentFilter("connectionState")
         )
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
-            broadcastReceiver!!, IntentFilter("countdownTimer"))
+            broadcastReceiver!!, IntentFilter("countdownTimer")
+        )
         super.onResume()
     }
 
@@ -249,6 +244,7 @@ class HomeFragment : Fragment() {
         binding.measText.text = byteIn.substring(byteIn.indexOf(" ") + 1)
         binding.measDText.text = byteOut.substring(byteOut.indexOf(" ") + 1)
 
+        // Update connection time by subtracting duration from 15 minutes
         val connDuration = 1
         val time = duration.split(":")
         val minutes = time[1].toInt()
@@ -256,14 +252,14 @@ class HomeFragment : Fragment() {
         val millis = (minutes * 60 + seconds) * 1000
         val millisUntilFinished = (connDuration * 60 * 1000) - millis
 
-        binding.connectBtn.text = String.format("%02d:%02d", minutes, seconds)
+
+        val _minutes = (millisUntilFinished / 1000) / 60
+        val _seconds = (millisUntilFinished / 1000) % 60
+
+        binding.connectBtn.text = String.format("%02d:%02d", _minutes, _seconds)
 
         val progress = ((millisUntilFinished * 100) / (connDuration * 60 * 1000))
         binding.cpIndicator.setProgressCompat(progress, true)
-
-        if (progress == 0) {
-            disconnect()
-        }
     }
 
     private fun startVPN(context: Context, server: Server) {

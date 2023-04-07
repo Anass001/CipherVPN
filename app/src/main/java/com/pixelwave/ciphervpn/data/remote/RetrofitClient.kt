@@ -1,4 +1,4 @@
-package com.pixelwave.ciphervpn.data.network
+package com.pixelwave.ciphervpn.data.remote
 
 import com.pixelwave.ciphervpn.util.Constants.Companion.BASE_URL
 import okhttp3.OkHttpClient
@@ -9,8 +9,8 @@ class RetrofitClient {
     companion object {
 
         private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-            .readTimeout(10, TimeUnit.SECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(180, TimeUnit.SECONDS)
+            .connectTimeout(180, TimeUnit.SECONDS)
             .build()
 
         fun getRetrofitInstance(): Retrofit {

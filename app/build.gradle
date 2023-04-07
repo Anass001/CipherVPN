@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -37,6 +38,10 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
     implementation project(path: ':openvpn')
 
@@ -67,6 +72,7 @@ dependencies {
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation("com.squareup.okhttp3:mockwebserver:4.10.0")
 
     //room
     def room_version = "2.4.3"
@@ -78,11 +84,18 @@ dependencies {
     implementation 'com.github.murgupluoglu:flagkit-android:1.0.2'
 
     //material3
-    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'com.google.android.material:material:1.8.0'
 
     //circle image view
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     //glide
     implementation 'com.github.bumptech.glide:glide:4.13.0'
+
+    // OpenCSV
+    implementation 'com.opencsv:opencsv:5.5.2'
+
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
 }

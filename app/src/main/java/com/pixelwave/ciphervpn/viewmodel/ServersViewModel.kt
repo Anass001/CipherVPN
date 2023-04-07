@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pixelwave.ciphervpn.data.Repository
 import com.pixelwave.ciphervpn.data.model.Server
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ServersViewModel(private val repository: Repository) : ViewModel() {
+@HiltViewModel
+class ServersViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private var servers: MutableLiveData<List<Server>> = MutableLiveData()
 

@@ -1,7 +1,5 @@
 package com.pixelwave.ciphervpn.fragment
 
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -17,17 +15,19 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixelwave.ciphervpn.CipherApplication
-import com.pixelwave.ciphervpn.R
 import com.pixelwave.ciphervpn.adapter.ServersAdapter
 import com.pixelwave.ciphervpn.data.model.ConnectionStatus
 import com.pixelwave.ciphervpn.databinding.FragmentServersBinding
 import com.pixelwave.ciphervpn.viewmodel.ServerSharedViewModel
 import com.pixelwave.ciphervpn.viewmodel.ServersViewModel
-import com.pixelwave.ciphervpn.viewmodel.ServersViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ServersFragment : Fragment() {
 
-    private lateinit var viewModel: ServersViewModel
+    private val viewModel by viewModels<ServersViewModel>()
+
     private lateinit var serverSharedViewModel: ServerSharedViewModel
 
     private lateinit var binding: FragmentServersBinding
@@ -47,11 +47,6 @@ class ServersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel = ViewModelProvider(
-            this,
-            (ServersViewModelFactory((requireActivity().application as CipherApplication).repository))
-        )[ServersViewModel::class.java]
 
         serverSharedViewModel =
             ViewModelProvider(requireActivity())[ServerSharedViewModel::class.java]

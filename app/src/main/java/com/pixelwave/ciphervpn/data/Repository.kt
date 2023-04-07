@@ -1,16 +1,19 @@
 package com.pixelwave.ciphervpn.data
 
 import android.content.SharedPreferences
-import android.util.Log
+import com.pixelwave.ciphervpn.data.db.AppDatabase
 import com.pixelwave.ciphervpn.data.db.ServerDao
-import com.pixelwave.ciphervpn.data.network.ServerService
+import com.pixelwave.ciphervpn.data.remote.ServerService
 import com.pixelwave.ciphervpn.data.model.Server
+import retrofit2.Retrofit
+import javax.inject.Inject
 
-class Repository(
-    private val serverDao: ServerDao,
+class Repository @Inject constructor(
+    private val serverDb: AppDatabase,
     private val serverApi: ServerService,
     private val sharedPreferences: SharedPreferences
 ) {
+    private val serverDao: ServerDao = serverDb.serverDao()
     private fun shouldUpdate(): Boolean {
         val lastUpdate = sharedPreferences.getLong("last_update_L", 0L)
         return System.currentTimeMillis().minus(lastUpdate) > 900000L
@@ -32,7 +35,7 @@ class Repository(
                 }
             }
         } catch (e: Exception) {
-            println("Servers loading from network failed with exception: ${e.message}")
+            println("Servers loading from network failed with exception: ${e.localizedMessage}")
         }
         return serverDao.getAll()
     }

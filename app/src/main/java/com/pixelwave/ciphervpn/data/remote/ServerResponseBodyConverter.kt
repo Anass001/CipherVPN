@@ -1,4 +1,4 @@
-package com.pixelwave.ciphervpn.data.network
+package com.pixelwave.ciphervpn.data.remote
 
 import com.pixelwave.ciphervpn.data.model.Server
 import com.pixelwave.ciphervpn.util.CsvParser
@@ -14,7 +14,7 @@ class ServerResponseBodyConverter : Converter.Factory() {
         retrofit: Retrofit
     ): Converter<ResponseBody, List<Server>> {
         return Converter { value ->
-            CsvParser.parse(value)
+            CsvParser.parse(value.byteStream())
         }
     }
 }
