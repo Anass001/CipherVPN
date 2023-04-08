@@ -1,7 +1,7 @@
 # CipherVPN
 CipherVPN is an Android VPN client based on the OpenVPN Android Client project, This app allows users to connect to a virtual private network (VPN) on their Android devices, providing an added layer of security and privacy when browsing the internet.
 
-<img src="https://github.com/Anass001/CipherVPN/blob/master/preview.jpg" align="center">
+<img src="https://github.com/Anass001/CipherVPN/blob/master/preview_image.jpg" align="center">
 
 ## How It Works
 CypherVPN enables users to establish a secure VPN tunnel between their device and the server. This encrypted tunnel passes all data through a secure channel, providing protection against hackers, surveillance, and other online threats. CypherVPN also allows users to change their virtual location, masking their real IP address and providing access to geo-restricted content.
